@@ -12,7 +12,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 
 qt_add_executable(${PROJECT_NAME}
   Worker.cpp Worker.h
-  Rial.cpp Rial.h
+  MainClass.cpp MainClass.h
   main.cpp
 )
 

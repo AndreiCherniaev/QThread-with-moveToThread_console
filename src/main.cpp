@@ -1,11 +1,11 @@
-#include "Rial.h"
+#include "MainClass.h"
 #include <QCoreApplication>
 #include <signal.h>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    Rial rial(QCoreApplication::instance());
+    MainClass rial(QCoreApplication::instance());
 
     //Connect handler like //signal(SIGINT, &SigInt_Handler);
     //thanks

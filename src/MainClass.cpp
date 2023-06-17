@@ -1,16 +1,16 @@
-#include "Rial.h"
+#include "MainClass.h"
 #include <QCoreApplication>
 #include <QTimer>
 
-Rial *Rial::rialSelf;
+MainClass *MainClass::rialSelf;
 
-Rial::Rial(QObject *parent) :
+MainClass::MainClass(QObject *parent) :
     QObject(parent)
   , worker(new Worker()) //родителя нет, ибо "The object cannot be moved if it has a parent."
   , thread(new QThread(this)) //родитель есть (не обязательно)
 {
     qDebug() << "MainWindow::MainWindow";
-    Rial::setSignalHandlerObject(this);
+    MainClass::setSignalHandlerObject(this);
 
     //Запуск выполнения метода run будет осуществляться по сигналу запуска от соответствующего потока
     connect(thread, &QThread::started, worker, &Worker::run);
@@ -22,47 +22,48 @@ Rial::Rial(QObject *parent) :
     connect(worker, &Worker::destroyed, this, &QCoreApplication::quit); //if worker will destroyed then application exit(1)
 
     //Коннект для передачи данных из первого объекта в первом потоке, ко второму объекту во втором потоке
-    connect(worker, &Worker::sendMessage, this, &Rial::mycallback, Qt::DirectConnection);
+    connect(worker, &Worker::sendMessage, this, &MainClass::mycallback, Qt::DirectConnection);
     worker->moveToThread(thread); //передаём объект worker (не имеет родителя!) в нить thread
 
-    //Устанавливаем текст в первый объект в первом потоке
+    //Устанавливаем текст в первый объект в первой нити
     worker->setMessage("Its your second thread again");
 
-    //Запуск потоков
-    worker->setRunning(true);
+    //Запуск нити
     thread->start();
 
     //Таймер завершения Приложения через 5 с
     qDebug() << "timer makes setRunning(false) after 5s";
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &Rial::timeout);
-    timer->start(5000);
+    connect(timer, &QTimer::timeout, this, &MainClass::timeout);
+    timer->start(2000);
 
     qDebug() << "parents" << worker->parent() << thread->parent();
 }
 
-Rial::~Rial()
+MainClass::~MainClass()
 {
-    qDebug() << "~MainWindow()";
+    qDebug() << "~MainWindow() wating thread";
+    thread->wait();
+    qDebug() << "~MainWindow() finish";
     //delete worker; //позаботится о том, чтобы worker, у которого нет parent, был удалён, строчка connect(worker, &Worker::finished, worker, &Worker::deleteLater);
 }
 
 //Обработчик случая Ctrl+C
-void Rial::handleSignal(int num){
+void MainClass::handleSignal(int num){
     qDebug()<<"Welcome to Signal handled: "<<num;
     //Остановка потоков через завершение выполнения метода run в объекте worker
-    worker->setRunning(false);
+    thread->requestInterruption(); //worker->setRunning(false);
     qDebug()<<"wating stop action";
 }
 
 //Обработчик случая завершения по таймауту
-void Rial::timeout()
+void MainClass::timeout()
 {
     //Остановка потоков через завершение выполнения метода run в объекте worker
-    worker->setRunning(false);
+    //thread->requestInterruption(); //worker->setRunning(false);
 }
 
-void Rial::mycallback()
+void MainClass::mycallback()
 {
     qDebug() << "Its your MainWindow";
 }
