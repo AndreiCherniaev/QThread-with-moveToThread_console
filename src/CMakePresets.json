@@ -1,0 +1,25 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "GoodAndreiPresetName",
+      "displayName": "GoodAndreiPreset",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/../build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "environment": {
+        "PATH": "/home/a/Qt/6.6.0/gcc_64/lib/cmake/Qt6"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "displayName": "Ninja Debug",
+      "configurePreset": "GoodAndreiPresetName",
+      "configuration": "Debug"
+    }
+  ]
+}
