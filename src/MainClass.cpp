@@ -53,7 +53,7 @@ void MainClass::handleSignal(int num){
     qDebug()<<"Welcome to Signal handled: "<<num;
     //Остановка потоков через завершение выполнения метода run в объекте worker
     thread->requestInterruption(); //worker->setRunning(false);
-    qDebug()<<"wating stop action";
+    qDebug()<<"requestInterruption";
 }
 
 //Обработчик случая завершения по таймауту
