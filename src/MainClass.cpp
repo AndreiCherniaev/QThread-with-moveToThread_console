@@ -63,7 +63,7 @@ void MainClass::timeout()
     //thread->requestInterruption(); //worker->setRunning(false);
 }
 
-void MainClass::mycallback()
+void MainClass::mycallback(QStringView message)
 {
     qDebug() << "Its your MainWindow";
 }

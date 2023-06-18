@@ -25,7 +25,7 @@ public:
     ~MainClass();
 
 private slots:
-    void mycallback();
+    void mycallback(QStringView message);
 
 public slots:
     void timeout();

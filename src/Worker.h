@@ -19,7 +19,7 @@ public:
 signals:
     void finished(); //сигнал, по которому будем завершать поток, после завершения метода run
     void messageChanged(QString message);
-    void sendMessage(QString message);
+    void sendMessage(QStringView message);
 
 public slots:
     void run(); //метод с пользовательскими алгоритмами, которые могут быть оформлены в этом методе внутри while(1)
