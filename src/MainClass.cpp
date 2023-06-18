@@ -65,5 +65,5 @@ void MainClass::timeout()
 
 void MainClass::mycallback(QStringView message)
 {
-    qDebug() << "Its your MainWindow";
+    qDebug() << "Its your MainWindow with message" << message;
 }
