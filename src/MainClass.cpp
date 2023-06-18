@@ -37,6 +37,11 @@ MainClass::MainClass(QObject *parent) :
     connect(timer, &QTimer::timeout, this, &MainClass::timeout);
     timer->start(2000);
 
+    #warning problem invalid pointer is becasue of timer t
+    static QTimer t(this);
+    connect(&t, &QTimer::timeout, this, [&](){qDebug() << "hello timer";});
+    t.start(2000);
+
     qDebug() << "parents" << worker->parent() << thread->parent();
 }
 
