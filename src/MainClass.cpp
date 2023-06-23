@@ -43,6 +43,9 @@ MainClass::MainClass(QObject *parent) :
     t.start(2000);
 
     qDebug() << "parents" << worker->parent() << thread->parent();
+    
+    #warning see also
+    //QCoreApplication::aboutToQuit()
 }
 
 MainClass::~MainClass()
