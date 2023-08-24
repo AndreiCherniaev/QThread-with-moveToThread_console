@@ -13,7 +13,7 @@ public:
     //кстати обратите внимание на Rial *Rial::rialSelf; -это тоже часть этого трюка
     //https://stackoverflow.com/questions/54467652/how-to-set-sa-handlerint-pointer-to-function-which-is-member-of-a-class-i
     static MainClass* rialSelf;
-    void handleSignal(int num);
+    void handleSignal(const int num);
     static void setSignalHandlerObject(MainClass* newRealSelf) {
         MainClass::rialSelf= newRealSelf;
     }
@@ -28,9 +28,9 @@ private slots:
     void mycallback(QStringView message);
 
 public slots:
-    void timeout();
+    void threadIsFinished();
 
 private:
-    Worker *worker;  //наш объект, в методах которого мы можем писать пользовательские алгоритмы обращаясь по необходимости ко всему богатству Qt
-    QThread *thread; //наша дополнительная нить, ради которой весь сыр-бор
+    QScopedPointer<Worker> worker;  //наш объект, в методах которого мы можем писать пользовательские алгоритмы обращаясь по необходимости ко всему богатству Qt
+    QScopedPointer<QThread> thread; //наша дополнительная нить, ради которой весь сыр-бор
 };

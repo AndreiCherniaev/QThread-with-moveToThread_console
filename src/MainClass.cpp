@@ -1,6 +1,5 @@
 #include "MainClass.h"
 #include <QCoreApplication>
-#include <QTimer>
 
 MainClass *MainClass::rialSelf;
 
@@ -13,17 +12,17 @@ MainClass::MainClass(QObject *parent) :
     MainClass::setSignalHandlerObject(this);
 
     //Запуск выполнения метода run будет осуществляться по сигналу запуска от соответствующего потока
-    connect(thread, &QThread::started, worker, &Worker::run);
+    connect(thread.get(), &QThread::started, worker.get(), &Worker::run);
     //Остановка потока же будет выполняться по сигналу finished от соответствующего объекта в потоке (то есть от worker)
-    connect(worker, &Worker::finished, thread, &QThread::quit); //если worker сделал emit signal "finished" тогда объект thread делает quit //if worker emit signal "finished" then thread quit
-    connect(worker, &Worker::finished, worker, &Worker::deleteLater); //если worker сделал emit signal "finished" тогда запланировать удалить этот (worker) объект //if worker emit signal "finished" then schedules this object (worker) for deletion
-    //connect(thread, &QThread::finished, thread, &QThread::deleteLater); //need or not need?
+    connect(worker.get(), &Worker::finished, thread.get(), &QThread::quit); //если worker сделал emit signal "finished" тогда объект thread делает quit //if worker emit signal "finished" then thread quit
+    //connect(worker, &Worker::finished, worker, &Worker::deleteLater); //no need because of QScopedPointer
+    //connect(thread, &QThread::finished, thread, &QThread::deleteLater); //no need because of QScopedPointer
 
-    connect(worker, &Worker::destroyed, this, &QCoreApplication::quit); //if worker will destroyed then application exit(1)
+    connect(thread.get(), &QThread::finished, this, &MainClass::threadIsFinished); //connect(worker, &Worker::destroyed, this, &QCoreApplication::quit); //if worker will destroyed then application exit(1)
 
     //Коннект для передачи данных из первого объекта в первом потоке, ко второму объекту во втором потоке
-    connect(worker, &Worker::sendMessage, this, &MainClass::mycallback, Qt::DirectConnection);
-    worker->moveToThread(thread); //передаём объект worker (не имеет родителя!) в нить thread
+    connect(worker.get(), &Worker::sendMessage, this, &MainClass::mycallback, Qt::DirectConnection);
+    worker->moveToThread(thread.get()); //передаём объект worker (не имеет родителя!) в нить thread
 
     //Устанавливаем текст в первый объект в первой нити
     worker->setMessage("Its your second thread again");
@@ -31,45 +30,32 @@ MainClass::MainClass(QObject *parent) :
     //Запуск нити
     thread->start();
 
-    //Таймер завершения Приложения через 5 с
-    qDebug() << "timer makes setRunning(false) after 5s";
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &MainClass::timeout);
-    timer->start(2000);
-
-    #warning problem invalid pointer is becasue of timer t
-    static QTimer t(this);
-    connect(&t, &QTimer::timeout, this, [&](){qDebug() << "hello timer";});
-    t.start(2000);
-
     qDebug() << "parents" << worker->parent() << thread->parent();
-    
-    #warning see also
-    //QCoreApplication::aboutToQuit()
 }
+
 
 MainClass::~MainClass()
 {
-    qDebug() << "~MainWindow() wating thread";
-    thread->wait();
-    qDebug() << "~MainWindow() finish";
-    //delete worker; //позаботится о том, чтобы worker, у которого нет parent, был удалён, строчка connect(worker, &Worker::finished, worker, &Worker::deleteLater);
+    qDebug() << "~MainWindow()";
 }
 
+
 //Обработчик случая Ctrl+C
-void MainClass::handleSignal(int num){
-    qDebug()<<"Welcome to Signal handled: "<<num;
+void MainClass::handleSignal(const int num){
+    qDebug()<<"Welcome to Signal handled: " << num;
     //Остановка потоков через завершение выполнения метода run в объекте worker
     thread->requestInterruption(); //worker->setRunning(false);
     qDebug()<<"requestInterruption";
 }
 
-//Обработчик случая завершения по таймауту
-void MainClass::timeout()
+
+//Обработчик вызывается когда thread finish
+void MainClass::threadIsFinished()
 {
-    //Остановка потоков через завершение выполнения метода run в объекте worker
-    //thread->requestInterruption(); //worker->setRunning(false);
+    qDebug() << "threadIsFinished";
+    QCoreApplication::quit();
 }
+
 
 void MainClass::mycallback(QStringView message)
 {
