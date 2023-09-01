@@ -1,6 +1,6 @@
 # QThread-with-moveToThread_console
  Qt example how make multi-thread console app.
- Use cmake or qmake build system.
+ Use cmake build system.
 
 
 <p align="center">

@@ -17,7 +17,7 @@ public:
     QString message() const;
 
 signals:
-    void finished(); //сигнал, по которому будем завершать поток, после завершения метода run
+    void finished(); //сигнал, по которому будем завершать нить, после завершения метода run()
     void messageChanged(QString message);
     void sendMessage(QStringView message);
 

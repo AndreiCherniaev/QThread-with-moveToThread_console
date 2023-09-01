@@ -11,16 +11,17 @@ MainClass::MainClass(QObject *parent) :
     qDebug() << "MainWindow::MainWindow";
     MainClass::setSignalHandlerObject(this);
 
-    //Запуск выполнения метода run будет осуществляться по сигналу запуска от соответствующего потока
+    //Старт метода run() будет осуществляться по сигналу запуска от соответствующей нити
     connect(thread.get(), &QThread::started, worker.get(), &Worker::run);
-    //Остановка потока же будет выполняться по сигналу finished от соответствующего объекта в потоке (то есть от worker)
-    connect(worker.get(), &Worker::finished, thread.get(), &QThread::quit); //если worker сделал emit signal "finished" тогда объект thread делает quit //if worker emit signal "finished" then thread quit
+    //Когда worker излучает finished, тогда нить прекращается (quit) //When worker emit signal "finished" then thread quit
+    connect(worker.get(), &Worker::finished, thread.get(), &QThread::quit);
     //connect(worker, &Worker::finished, worker, &Worker::deleteLater); //no need because of QScopedPointer
     //connect(thread, &QThread::finished, thread, &QThread::deleteLater); //no need because of QScopedPointer
 
-    connect(thread.get(), &QThread::finished, this, &MainClass::threadIsFinished); //connect(worker, &Worker::destroyed, this, &QCoreApplication::quit); //if worker will destroyed then application exit(1)
+    //Основная нить анализирует, что происходит с другими, в threadIsFinished()
+    connect(thread.get(), &QThread::finished, this, &MainClass::threadIsFinished);
 
-    //Коннект для передачи данных из первого объекта в первом потоке, ко второму объекту во втором потоке
+    //Коннект для передачи данных из первого объекта в первой нити, ко второму объекту во второй нити
     connect(worker.get(), &Worker::sendMessage, this, &MainClass::mycallback, Qt::DirectConnection);
     worker->moveToThread(thread.get()); //передаём объект worker (не имеет родителя!) в нить thread
 
@@ -43,7 +44,7 @@ MainClass::~MainClass()
 //Обработчик случая Ctrl+C
 void MainClass::handleSignal(const int num){
     qDebug()<<"Welcome to Signal handled: " << num;
-    //Остановка потоков через завершение выполнения метода run в объекте worker
+    //Остановка нитей через завершение выполнения метода run в объекте worker
     thread->requestInterruption(); //worker->setRunning(false);
     qDebug()<<"requestInterruption";
 }
@@ -52,7 +53,10 @@ void MainClass::handleSignal(const int num){
 //Обработчик вызывается когда thread finish
 void MainClass::threadIsFinished()
 {
-    qDebug() << "threadIsFinished";
+    //If you have multimp threads you can analizy which finish
+    if(thread.get()->isFinished()){
+        qDebug() << "threadIsFinished";
+    }
     QCoreApplication::quit();
 }
 
