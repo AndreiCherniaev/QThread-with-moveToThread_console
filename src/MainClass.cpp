@@ -23,11 +23,9 @@ MainClass::MainClass(QObject *parent) :
 
     //Коннект для передачи данных из первого объекта в первой нити, ко второму объекту во второй нити
     connect(worker.get(), &Worker::sendMessage, this, &MainClass::mycallback, Qt::DirectConnection);
+
+    worker->setMessage("Its your second thread again"); //Устанавливаем текст в первый объект в первой нити
     worker->moveToThread(thread.get()); //передаём объект worker (не имеет родителя!) в нить thread
-
-    //Устанавливаем текст в первый объект в первой нити
-    worker->setMessage("Its your second thread again");
-
     //Запуск нити
     thread->start();
 
