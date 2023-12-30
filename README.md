@@ -8,3 +8,5 @@
   <br>
     <em>Иллюстрация иерархии в Qt</em>
 </p>
+
+See [also](https://www.toptal.com/qt/qt-multithreading-c-plus-plus).
