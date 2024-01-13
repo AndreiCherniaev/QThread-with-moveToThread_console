@@ -29,7 +29,7 @@ void Worker::run()
     count = 0;
     while(1)
     {
-        if ( QThread::currentThread()->isInterruptionRequested() ) {
+        if(QThread::currentThread()->isInterruptionRequested()){
             goto exit_LABEL;
         }
 

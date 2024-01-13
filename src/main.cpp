@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
     sigemptyset(&hup.sa_mask);
     hup.sa_flags = 0;
     hup.sa_flags |= SA_RESTART;
-    if (sigaction(SIGINT, &hup, 0))
+    if(sigaction(SIGINT, &hup, 0))
       return 1;
 
     return a.exec();
