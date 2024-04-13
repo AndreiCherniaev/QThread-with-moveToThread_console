@@ -8,9 +8,7 @@ int main(int argc, char *argv[])
     MainClass mainClass(QCoreApplication::instance());
 
     //Connect handler like //signal(SIGINT, &SigInt_Handler);
-    //thanks
-    // https://forum.qt.io/topic/5927/how-to-use-sigaction-in-qt/6
-    // https://stackoverflow.com/questions/54467652/how-to-set-sa-handlerint-pointer-to-function-which-is-member-of-a-class-i
+    //thanks https://github.com/AndreiCherniaev/QCoreApplication_quit_example
     struct sigaction hup;
     hup.sa_handler = mainClass.callSignalHandler;
     sigemptyset(&hup.sa_mask);

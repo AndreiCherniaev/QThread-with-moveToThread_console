@@ -9,4 +9,5 @@
     <em>Иллюстрация иерархии в Qt</em>
 </p>
 
-See [also](https://www.toptal.com/qt/qt-multithreading-c-plus-plus).
+See [article](https://www.toptal.com/qt/qt-multithreading-c-plus-plus).
+About SigInt (Ctrl+C) quit see [example](https://github.com/AndreiCherniaev/QCoreApplication_quit_example).
