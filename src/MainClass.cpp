@@ -11,6 +11,7 @@ MainClass::MainClass(QObject *parent) :
     qDebug() << "MainWindow::MainWindow";
     MainClass::setSignalHandlerObject(this);
 
+    worker->moveToThread(thread.get()); //передаём объект worker (не должен иметь родителя!) в нить thread
     //Старт метода run() будет осуществляться по сигналу запуска от соответствующей нити
     connect(thread.get(), &QThread::started, worker.get(), &Worker::run);
     //Когда worker излучает finished, тогда нить прекращается (quit) //When worker emit signal "finished" then thread quit
@@ -25,7 +26,6 @@ MainClass::MainClass(QObject *parent) :
     connect(worker.get(), &Worker::sendMessage, this, &MainClass::mycallback, Qt::DirectConnection);
 
     worker->setMessage("Its your second thread again"); //Устанавливаем текст в первый объект в первой нити
-    worker->moveToThread(thread.get()); //передаём объект worker (не имеет родителя!) в нить thread
     //Запуск нити
     thread->start();
 
